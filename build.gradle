@@ -9,12 +9,12 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.5.3'
-        classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.8")
+//        classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.8")
     }
 }
 
 apply plugin: 'java'
-apply plugin: 'com.google.protobuf'
+//apply plugin: 'com.google.protobuf'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -27,26 +27,26 @@ repositories {
     jcenter()
 }
 
-protobuf {
-    protoc { artifact = 'com.google.protobuf:protoc:3.11.0' }
-    generatedFilesBaseDir = "$projectDir/src/"
-    plugins {
-        grpc {
-            artifact = 'io.grpc:protoc-gen-grpc-java:1.25.0'
-        }
-        javalite {
-            artifact = 'com.google.protobuf:protoc-gen-javalite:3.0.0'
-        }
-    }
-    generateProtoTasks {
-        all()*.plugins {
-            javalite {}
-            grpc { // Options added to --grpc_out
-                option 'lite'
-                outputSubDir = 'java'
-            }
-        }
-    }
+//protobuf {
+//    protoc { artifact = 'com.google.protobuf:protoc:3.11.0' }
+//    generatedFilesBaseDir = "$projectDir/src/"
+//    plugins {
+//        grpc {
+//            artifact = 'io.grpc:protoc-gen-grpc-java:1.25.0'
+//        }
+//        javalite {
+//            artifact = 'com.google.protobuf:protoc-gen-javalite:3.0.0'
+//        }
+//    }
+//    generateProtoTasks {
+//        all()*.plugins {
+//            javalite {}
+//            grpc { // Options added to --grpc_out
+//                option 'lite'
+//                outputSubDir = 'java'
+//            }
+//        }
+//    }
 //    generateProtoTasks {
 //        all()*.plugins {
 //            javalite {}
@@ -59,7 +59,7 @@ protobuf {
 //            }
 //        }
 //    }
-}
+//}
 
 dependencies {
 
