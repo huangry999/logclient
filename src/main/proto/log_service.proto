@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "tech.hry.logclient.grpc";
+
+enum LogLevel {
+    TRACE = 0;
+    DEBUG = 1;
+    INFO = 2;
+    WARNING = 3;
+    ERROR = 4;
+    SERVICE = 5;
+}
+
+message SaveLogRequest {
+    string appName = 1;
+    LogLevel level = 2;
+    string title = 3;
+    string message = 4;
+    map<string, string> tags = 5;
+    string time = 6;
+}
+
+message SaveLogResponse {
+
+}
+
+service LogService {
+    rpc Store (SaveLogRequest) returns (SaveLogResponse);
+}
