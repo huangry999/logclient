@@ -5,12 +5,15 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.5")
+        classpath("com.google.protobuf:protobuf-gradle-plugin:0.8.8")
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'com.google.protobuf'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 repositories {
     maven { url 'https://maven.aliyun.com/repository/google' }

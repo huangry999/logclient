@@ -68,14 +68,14 @@ public class LogServiceClient {
         @Override
         public void onNext(SaveLogResponse value) {
             if (conf.getSavedConsumer() != null) {
-                conf.getSavedConsumer().accept(value);
+                conf.getSavedConsumer().response(value);
             }
         }
 
         @Override
         public void onError(Throwable t) {
             if (conf.getSaveExceptionConsumer() != null) {
-                conf.getSaveExceptionConsumer().accept(t);
+                conf.getSaveExceptionConsumer().exception(t);
             }
         }
 
