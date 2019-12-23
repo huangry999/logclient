@@ -3,6 +3,8 @@ package tech.hry.logclient;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
+import lombok.AccessLevel;
+import lombok.Getter;
 import tech.hry.logclient.grpc.LogServiceGrpc;
 import tech.hry.logclient.grpc.SaveLogRequest;
 import tech.hry.logclient.grpc.SaveLogResponse;
@@ -13,8 +15,10 @@ public class LogServiceClient {
     private static volatile LogServiceClient instance;
     private static LogServiceClientConfCallback callback;
     private final LogServiceGrpc.LogServiceStub stub;
+    @Getter(AccessLevel.PACKAGE)
     private final LogServiceClientConf conf;
     private final ManagedChannel mc;
+
 
     /**
      * 设置连接参数
@@ -30,7 +34,7 @@ public class LogServiceClient {
      *
      * @return 连接单例
      */
-    public static LogServiceClient getInstance() {
+    public static LogServiceClient getInstance() throws Exception {
         if (instance != null) {
             return instance;
         }
@@ -56,32 +60,31 @@ public class LogServiceClient {
         } else {
             stub = LogServiceGrpc.newStub(mc);
         }
+        new EsLogMessageConsumer().start();
+        new FailLogMessageConsumer().start();
+        new OverFlowLogMessageConsumer().start();
     }
 
     private static class responseObserver implements StreamObserver<SaveLogResponse> {
-        private final LogServiceClientConf conf;
+        private final SaveLogRequest log;
 
-        private responseObserver(LogServiceClientConf conf) {
-            this.conf = conf;
+        public responseObserver(SaveLogRequest log) {
+            this.log = log;
         }
 
         @Override
         public void onNext(SaveLogResponse value) {
-            if (conf.getSavedConsumer() != null) {
-                conf.getSavedConsumer().response(value);
-            }
+            //ignore
         }
 
         @Override
         public void onError(Throwable t) {
-            if (conf.getSaveExceptionConsumer() != null) {
-                conf.getSaveExceptionConsumer().exception(t);
-            }
+            LogMessageQueue.offerFail(log);
         }
 
         @Override
         public void onCompleted() {
-
+            //ignore
         }
     }
 
@@ -91,7 +94,15 @@ public class LogServiceClient {
      * @param request 日志内容
      */
     public void save(SaveLogRequest request) {
-        stub.withDeadlineAfter(conf.getGrpcTimeoutMs(), TimeUnit.MILLISECONDS).store(request, new responseObserver(conf));
+        boolean accept = true;
+        if (conf.getFilters() != null) {
+            for (LogFilter filter : conf.getFilters()) {
+                accept &= filter.accept(request);
+            }
+        }
+        if (accept) {
+            stub.withDeadlineAfter(conf.getGrpcTimeoutMs(), TimeUnit.MILLISECONDS).store(request, new responseObserver(request));
+        }
     }
 
     /**

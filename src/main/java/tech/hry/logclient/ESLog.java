@@ -61,7 +61,7 @@ public class ESLog {
                 .setMessage(message)
                 .setTime(logTimeFormat.format(new Date()))
                 .build();
-        LogServiceClient.getInstance().save(saveLogRequest);
+        LogMessageQueue.offerEs(saveLogRequest);
     }
 
     private static String throwableToString(Throwable throwable) {

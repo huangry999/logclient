@@ -1,8 +1,8 @@
 package tech.hry.logclient;
 
 import org.junit.Test;
-import tech.hry.logclient.grpc.SaveLogResponse;
 
+import java.io.File;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assume.assumeTrue;
@@ -11,7 +11,7 @@ public class ESLogTest {
 
     @Test
     public void log() throws Exception {
-        final AtomicBoolean success = new AtomicBoolean(false);
+        final File file = new File("D:\\test.log");
 
         ESLog.APP_NAME = "log";
         LogServiceClient.setCallback(new LogServiceClientConfCallback() {
@@ -21,23 +21,12 @@ public class ESLogTest {
                 clientConf.setGrpcHost("94hry.tech");
                 clientConf.setGrpcIp(9090);
                 clientConf.setGrpcTimeoutMs(3000);
-                clientConf.setSaveExceptionConsumer(new ThrowableCallback() {
-                    @Override
-                    public void exception(Throwable throwable) {
-                        System.err.println(throwable);
-                    }
-                });
-                clientConf.setSavedConsumer(new ResponseCallback() {
-                    @Override
-                    public void response(SaveLogResponse response) {
-                        success.set(true);
-                    }
-                });
+                clientConf.setFailStrategy(new AppendToFileStrategy(file));
+                clientConf.setOverFlowStrategy(new AppendToFileStrategy(file));
                 return clientConf;
             }
         });
         ESLog.info("Test", "test info", "key", "logfun");
         Thread.sleep(4000);
-        assumeTrue(success.get());
     }
 }
