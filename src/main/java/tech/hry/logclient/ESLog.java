@@ -1,5 +1,6 @@
 package tech.hry.logclient;
 
+import com.google.common.base.Strings;
 import tech.hry.logclient.grpc.LogLevel;
 import tech.hry.logclient.grpc.SaveLogRequest;
 
@@ -10,10 +11,11 @@ import java.util.Date;
 
 public class ESLog {
     private static final SimpleDateFormat logTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
+    public static final String DEFAULT_APP_NAME = "log";
     /**
      * 本应用的APP Name，ES中的索引
      */
-    public static String APP_NAME = "log";
+    public static String APP_NAME = DEFAULT_APP_NAME;
 
     public static void trace(String title, String message, String... tags) {
         log(LogLevel.TRACE, title, message, tags);
@@ -55,10 +57,10 @@ public class ESLog {
             }
         }
         SaveLogRequest saveLogRequest = builder
-                .setAppName(APP_NAME)
-                .setLevel(level)
-                .setTitle(title)
-                .setMessage(message)
+                .setAppName(Strings.isNullOrEmpty(APP_NAME) ? DEFAULT_APP_NAME : APP_NAME)
+                .setLevel(level == null ? LogLevel.TRACE : level)
+                .setTitle(Strings.isNullOrEmpty(title) ? "" : title)
+                .setMessage(Strings.isNullOrEmpty(message) ? "" : message)
                 .setTime(logTimeFormat.format(new Date()))
                 .build();
         LogMessageQueue.offerEs(saveLogRequest);

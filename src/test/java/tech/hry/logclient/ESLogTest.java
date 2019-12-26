@@ -1,5 +1,6 @@
 package tech.hry.logclient;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.io.File;
@@ -7,6 +8,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assume.assumeTrue;
 
+@Slf4j
 public class ESLogTest {
 
     @Test
@@ -27,6 +29,7 @@ public class ESLogTest {
             }
         });
         ESLog.info("Test", "test info", "key", "logfun");
+        log.debug("haha");
         Thread.sleep(4000);
     }
 }
