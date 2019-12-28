@@ -101,7 +101,13 @@ public class LogServiceClient {
             }
         }
         if (accept) {
-            stub.withDeadlineAfter(conf.getGrpcTimeoutMs(), TimeUnit.MILLISECONDS).store(request, new responseObserver(request));
+            SaveLogRequest finalRequest = request;
+            if (conf.getAspects() != null){
+                for (LogAspect aspect : conf.getAspects()){
+                    finalRequest = aspect.handle(finalRequest);
+                }
+            }
+            stub.withDeadlineAfter(conf.getGrpcTimeoutMs(), TimeUnit.MILLISECONDS).store(finalRequest, new responseObserver(request));
         }
     }
 

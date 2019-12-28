@@ -13,6 +13,7 @@ public class LogServiceClientConf {
     private int grpcIp;
     private int grpcTimeoutMs;
     private List<LogFilter> filters;
+    private List<LogAspect> aspects;
     private LogStrategy overFlowStrategy;
     private LogStrategy failStrategy;
 }
