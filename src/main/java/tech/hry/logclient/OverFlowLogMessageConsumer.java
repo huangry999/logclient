@@ -1,5 +1,6 @@
 package tech.hry.logclient;
 
+
 import tech.hry.logclient.grpc.SaveLogRequest;
 
 class OverFlowLogMessageConsumer extends LogMessageConsumer {

@@ -34,7 +34,7 @@ class LogMessageQueue {
         if (log == null) {
             return;
         }
-        if (failMessageQueue.size() >= maxLengthToSkip){
+        if (failMessageQueue.size() >= maxLengthToSkip) {
             failMessageQueue.clear();
         }
         failMessageQueue.offer(log);
@@ -46,16 +46,16 @@ class LogMessageQueue {
      *
      * @param log 日志
      */
-    static void offerEs(SaveLogRequest log) {
+    static void offerEs(BabyLog log) {
         if (log == null) {
             return;
         }
         boolean inserted = false;
         while (!inserted) {
-            inserted = esMessageQueue.offer(log);
+            inserted = esMessageQueue.offer(log.convert());
             if (!inserted) {
                 esMessageQueue.drainTo(overFlowMessageQueue);
-                if (overFlowMessageQueue.size() >= maxLengthToSkip){
+                if (overFlowMessageQueue.size() >= maxLengthToSkip) {
                     overFlowMessageQueue.clear();
                 }
             }

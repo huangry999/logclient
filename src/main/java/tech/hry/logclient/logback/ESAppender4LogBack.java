@@ -24,28 +24,28 @@ public class ESAppender4LogBack extends AppenderBase<ILoggingEvent> {
         } else {
             msg = eventObject.getFormattedMessage();
         }
-
+        ESLog log = ESLog.getInstance();
         switch (eventObject.getLevel().levelInt) {
             case TRACE_INT:
             case ALL_INT:
-                ESLog.trace(null, msg);
+                log.trace(null, msg);
                 break;
             case DEBUG_INT:
-                ESLog.debug(null, msg);
+                log.debug(null, msg);
                 break;
             case INFO_INT:
-                ESLog.info(null, msg);
+                log.info(null, msg);
                 break;
             case WARN_INT:
-                ESLog.warning(null, msg);
+                log.warning(null, msg);
                 break;
             case ERROR_INT:
-                ESLog.error(null, msg);
+                log.error(null, msg);
                 break;
             case OFF_INT:
-                ESLog.service(null, msg);
+                log.service(null, msg);
             default:
-                ESLog.trace(null, msg);
+                log.trace(null, msg);
                 break;
         }
     }

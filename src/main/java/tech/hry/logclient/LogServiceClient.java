@@ -91,21 +91,26 @@ public class LogServiceClient {
     /**
      * 保存日志
      *
-     * @param request 日志内容
+     * @param request 日志
      */
     public void save(SaveLogRequest request) {
         boolean accept = true;
-        if (conf.getFilters() != null) {
-            for (LogFilter filter : conf.getFilters()) {
+        if (conf.getGlobalFilters() != null) {
+            for (LogFilter filter : conf.getGlobalFilters()) {
                 accept &= filter.accept(request);
             }
         }
         if (accept) {
             SaveLogRequest finalRequest = request;
-            if (conf.getAspects() != null){
-                for (LogAspect aspect : conf.getAspects()){
-                    finalRequest = aspect.handle(finalRequest);
+            if (conf.getGlobalAspects() != null) {
+                for (LogAspect aspect : conf.getGlobalAspects()) {
+                    if (aspect != null) {
+                        finalRequest = aspect.handle(finalRequest);
+                    }
                 }
+            }
+            if (conf.getAspectThreadLocal().get() != null){
+                finalRequest = conf.getAspectThreadLocal().get().handle(finalRequest);
             }
             stub.withDeadlineAfter(conf.getGrpcTimeoutMs(), TimeUnit.MILLISECONDS).store(finalRequest, new responseObserver(request));
         }

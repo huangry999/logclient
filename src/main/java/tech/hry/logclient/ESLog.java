@@ -2,68 +2,64 @@ package tech.hry.logclient;
 
 import com.google.common.base.Strings;
 import tech.hry.logclient.grpc.LogLevel;
-import tech.hry.logclient.grpc.SaveLogRequest;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class ESLog {
-    private static final SimpleDateFormat logTimeFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
-    public static final String DEFAULT_APP_NAME = "log";
-    /**
-     * 本应用的APP Name，ES中的索引
-     */
-    public static String APP_NAME = DEFAULT_APP_NAME;
 
-    public static void trace(String title, String message, String... tags) {
+    public static ESLog getInstance(){
+        return new ESLog();
+    }
+
+    private ESLog() {
+    }
+
+    public void trace(String title, String message, Object... tags) {
         log(LogLevel.TRACE, title, message, tags);
     }
 
-    public static void debug(String title, String message, String... tags) {
+    public void debug(String title, String message, Object... tags) {
         log(LogLevel.DEBUG, title, message, tags);
     }
 
-    public static void info(String title, String message, String... tags) {
+    public void info(String title, String message, Object... tags) {
         log(LogLevel.INFO, title, message, tags);
     }
 
-    public static void warning(String title, String message, String... tags) {
+    public void warning(String title, String message, Object... tags) {
         log(LogLevel.WARNING, title, message, tags);
     }
 
-    public static void error(String title, Throwable throwable, String... tags) {
+    public void error(String title, Throwable throwable, Object... tags) {
         log(LogLevel.ERROR, title, throwableToString(throwable), tags);
     }
 
-    public static void service(String title, Throwable throwable, String... tags) {
+    public void service(String title, Throwable throwable, Object... tags) {
         log(LogLevel.SERVICE, title, throwableToString(throwable), tags);
     }
 
-    public static void error(String title, String message, String... tags) {
+    public void error(String title, String message, Object... tags) {
         log(LogLevel.ERROR, title, message, tags);
     }
 
-    public static void service(String title, String message, String... tags) {
+    public void service(String title, String message, Object... tags) {
         log(LogLevel.SERVICE, title, message, tags);
     }
 
-    private static void log(LogLevel level, String title, String message, String... tags) {
-        SaveLogRequest.Builder builder = SaveLogRequest.newBuilder();
-        for (int i = 0; i < tags.length; i += 2) {
-            if (i + 1 < tags.length) {
-                builder.putTags(tags[i], tags[i + 1]);
+    private void log(LogLevel level, String title, String message, Object... tags) {
+        BabyLog babyLog = new BabyLog();
+        if (tags.length > 1) {
+            for (int i = 0; i < tags.length; i += 2) {
+                if (i + 1 < tags.length && tags[i] != null && tags[i + 1] != null) {
+                    babyLog.getTags().put(tags[i].toString(), tags[i + 1].toString());
+                }
             }
         }
-        SaveLogRequest saveLogRequest = builder
-                .setAppName(Strings.isNullOrEmpty(APP_NAME) ? DEFAULT_APP_NAME : APP_NAME)
-                .setLevel(level == null ? LogLevel.TRACE : level)
-                .setTitle(Strings.isNullOrEmpty(title) ? "" : title)
-                .setMessage(Strings.isNullOrEmpty(message) ? "" : message)
-                .setTime(logTimeFormat.format(new Date()))
-                .build();
-        LogMessageQueue.offerEs(saveLogRequest);
+        babyLog.setLogLevel(level == null ? LogLevel.TRACE : level);
+        babyLog.setTitle(Strings.isNullOrEmpty(title) ? "" : title);
+        babyLog.setMessage(Strings.isNullOrEmpty(message) ? "" : message);
+        LogMessageQueue.offerEs(babyLog);
     }
 
     private static String throwableToString(Throwable throwable) {

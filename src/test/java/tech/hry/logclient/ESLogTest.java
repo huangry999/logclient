@@ -4,9 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import static org.junit.Assume.assumeTrue;
 
 @Slf4j
 public class ESLogTest {
@@ -15,7 +12,6 @@ public class ESLogTest {
     public void log() throws Exception {
         final File file = new File("D:\\test.log");
 
-        ESLog.APP_NAME = "log";
         LogServiceClient.setCallback(new LogServiceClientConfCallback() {
             @Override
             public LogServiceClientConf config() {
@@ -25,11 +21,12 @@ public class ESLogTest {
                 clientConf.setGrpcTimeoutMs(3000);
                 clientConf.setFailStrategy(new AppendToFileStrategy(file));
                 clientConf.setOverFlowStrategy(new AppendToFileStrategy(file));
+                clientConf.setAppName("log");
                 return clientConf;
             }
         });
-        ESLog.info("Test", "test info", "key", "logfun");
+        ESLog.getInstance().info("Test", "test info", "key", "logfun");
         log.debug("haha");
-        Thread.sleep(4000);
+        Thread.sleep(400000000);
     }
 }
